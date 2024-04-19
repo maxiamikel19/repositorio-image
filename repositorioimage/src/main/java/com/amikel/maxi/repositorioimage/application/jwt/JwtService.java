@@ -13,6 +13,10 @@ import org.springframework.stereotype.Service;
 import com.amikel.maxi.repositorioimage.domain.AccessToken;
 import com.amikel.maxi.repositorioimage.domain.entity.User;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 
@@ -47,6 +51,24 @@ public class JwtService {
     private Map<String, Object> generateTokenUserClaims(User user){
         Map<String, Object> claims = new HashMap<>();
         claims.put("name", user.getName());
+        claims.put("created", user.getCreatedAt().getDayOfMonth() + "/" + user.getCreatedAt().getMonthValue() + "/" + user.getCreatedAt().getYear());
         return claims;
     }
+
+    public String getEmailFromToken(String tokenJwt){
+        try {
+            JwtParser build = Jwts.parser().verifyWith(keyGenerator.getKey()).build();
+
+            Jws<Claims> claimsJts = build.parseSignedClaims(tokenJwt);
+
+            Claims claims = claimsJts.getPayload();
+            
+            return claims.getSubject();
+
+        } catch (JwtException e) {
+            throw new JwtInvalidTokenException(e.getMessage());
+        }
+       
+    }
+    
 }

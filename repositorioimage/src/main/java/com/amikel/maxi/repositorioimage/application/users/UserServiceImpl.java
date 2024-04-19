@@ -1,5 +1,7 @@
 package com.amikel.maxi.repositorioimage.application.users;
 
+import java.time.LocalDateTime;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,7 @@ public class UserServiceImpl implements UserService{
             throw new ObjectCreateDuplicationException("User email aleready teken");
         }
         encodeUserPassword(user);
+        user.setCreatedAt(LocalDateTime.now());
         return userRepository.save(user);
     }
 
